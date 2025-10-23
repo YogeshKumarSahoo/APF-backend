@@ -1,0 +1,27 @@
+{
+  "name": "branch-data-api",
+  "version": "1.0.0",
+  "description": "Express API for appending branch data to Google Sheets",
+  "main": "app.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "googleapis": "^128.0.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "express",
+    "google-sheets",
+    "api"
+  ],
+  "author": "",
+  "license": "ISC"
+}
