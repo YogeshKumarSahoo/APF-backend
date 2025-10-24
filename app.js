@@ -42,6 +42,13 @@ app.post('/api/branches', async (req, res) => {
         // Upload images to S3 and get URLs
         let imageUrls = {};
         try {
+            console.log('Starting S3 upload for branch:', branchId);
+            console.log('Images provided:', {
+                noticeBoard: !!noticeBoardBase64,
+                waitingArea: !!waitingAreaBase64,
+                branchBoard: !!branchBoardBase64
+            });
+            
             imageUrls = await s3Service.uploadBranchImages(branchId, {
                 noticeBoardBase64,
                 waitingAreaBase64,
@@ -51,6 +58,8 @@ app.post('/api/branches', async (req, res) => {
                 latitude,
                 longitude
             });
+            
+            console.log('S3 upload completed. URLs:', imageUrls);
         } catch (s3Error) {
             console.error('S3 upload error:', s3Error);
             return res.status(500).json({
@@ -72,8 +81,12 @@ app.post('/api/branches', async (req, res) => {
             new Date().toISOString() // Timestamp
         ];
 
+        console.log('Preparing to write to Google Sheets. Row data:', rowData);
+
         // Append to Google Sheet
         const result = await googleSheetsService.appendRowToSheet(rowData);
+        
+        console.log('Google Sheets update result:', result);
 
         res.json({
             success: true,

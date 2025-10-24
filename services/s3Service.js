@@ -138,33 +138,51 @@ async function uploadBranchImages(branchId, images, branchData = {}) {
     const results = {};
     
     try {
+        console.log(`Starting upload for branch ${branchId} with data:`, branchData);
+        console.log('Images to upload:', Object.keys(images).filter(key => images[key]));
+        
         // Upload each image type
         const uploadPromises = [];
         
         if (images.noticeBoardBase64) {
+            console.log('Uploading notice board image...');
             uploadPromises.push(
                 uploadBase64Image(images.noticeBoardBase64, branchId, 'notice-board', branchData)
-                    .then(url => { results.noticeBoardUrl = url; })
+                    .then(url => { 
+                        console.log('Notice board URL:', url);
+                        results.noticeBoardUrl = url; 
+                    })
             );
         }
         
         if (images.waitingAreaBase64) {
+            console.log('Uploading waiting area image...');
             uploadPromises.push(
                 uploadBase64Image(images.waitingAreaBase64, branchId, 'waiting-area', branchData)
-                    .then(url => { results.waitingAreaUrl = url; })
+                    .then(url => { 
+                        console.log('Waiting area URL:', url);
+                        results.waitingAreaUrl = url; 
+                    })
             );
         }
         
         if (images.branchBoardBase64) {
+            console.log('Uploading branch board image...');
             uploadPromises.push(
                 uploadBase64Image(images.branchBoardBase64, branchId, 'branch-board', branchData)
-                    .then(url => { results.branchBoardUrl = url; })
+                    .then(url => { 
+                        console.log('Branch board URL:', url);
+                        results.branchBoardUrl = url; 
+                    })
             );
         }
+        
+        console.log(`Waiting for ${uploadPromises.length} uploads to complete...`);
         
         // Wait for all uploads to complete
         await Promise.all(uploadPromises);
         
+        console.log('All uploads completed. Final results:', results);
         return results;
         
     } catch (error) {

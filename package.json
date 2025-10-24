@@ -9,7 +9,7 @@
     "dev": "nodemon app.js"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.914.0",
+    "@aws-sdk/client-s3": "^3.916.0",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
