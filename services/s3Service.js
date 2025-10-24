@@ -113,7 +113,6 @@ async function uploadBase64Image(base64String, branchId, imageType, branchData =
             Key: key,
             Body: buffer,
             ContentType: contentType,
-            ACL: 'public-read', // Make the object publicly readable
             Metadata: metadata
         });
         

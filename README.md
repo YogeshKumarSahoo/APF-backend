@@ -51,7 +51,25 @@ A clean Express API for appending branch data to Google Sheets with AWS S3 image
 
 **Required S3 Permissions:**
 - `s3:PutObject` - Upload images
-- `s3:PutObjectAcl` - Set public read access
+- `s3:GetObject` - Read images (for bucket policy)
+
+**Bucket Policy Setup:**
+Add this bucket policy to make uploaded images publicly readable:
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": "arn:aws:s3:::YOUR-BUCKET-NAME/*"
+    }
+  ]
+}
+```
+Replace `YOUR-BUCKET-NAME` with your actual bucket name.
 
 ## API Endpoints
 
