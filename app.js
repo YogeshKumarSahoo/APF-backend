@@ -7,10 +7,11 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '50mb' })); // Increased limit for base64 images
+app.use(express.json({ limit: '10mb' })); // Reduced limit since images go to S3
 
-// Import Google Sheets service
+// Import services
 const googleSheetsService = require('./services/googleSheetsService');
+const s3Service = require('./services/s3Service');
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -38,15 +39,36 @@ app.post('/api/branches', async (req, res) => {
             });
         }
 
-        // Prepare row data for Google Sheets
+        // Upload images to S3 and get URLs
+        let imageUrls = {};
+        try {
+            imageUrls = await s3Service.uploadBranchImages(branchId, {
+                noticeBoardBase64,
+                waitingAreaBase64,
+                branchBoardBase64
+            }, {
+                branchName,
+                latitude,
+                longitude
+            });
+        } catch (s3Error) {
+            console.error('S3 upload error:', s3Error);
+            return res.status(500).json({
+                success: false,
+                error: 'Failed to upload images to S3',
+                details: s3Error.message
+            });
+        }
+
+        // Prepare row data for Google Sheets (now with S3 URLs instead of base64)
         const rowData = [
             branchId,
             branchName,
             latitude.toString(),
             longitude.toString(),
-            noticeBoardBase64 || '',
-            waitingAreaBase64 || '',
-            branchBoardBase64 || '',
+            imageUrls.noticeBoardUrl || '',
+            imageUrls.waitingAreaUrl || '',
+            imageUrls.branchBoardUrl || '',
             new Date().toISOString() // Timestamp
         ];
 
@@ -61,7 +83,12 @@ app.post('/api/branches', async (req, res) => {
                 branchName,
                 latitude,
                 longitude,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                images: {
+                    noticeBoardUrl: imageUrls.noticeBoardUrl,
+                    waitingAreaUrl: imageUrls.waitingAreaUrl,
+                    branchBoardUrl: imageUrls.branchBoardUrl
+                }
             },
             sheetUpdate: result
         });
